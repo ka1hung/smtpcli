@@ -88,7 +88,7 @@ func (m *Message) toBytes() []byte {
 	}
 	buf.WriteString(fmt.Sprintf("Content-Type: %s\n", m.ContentType))
 
-	buf.WriteString(m.Body)
+	buf.WriteString("\n" + m.Body)
 	if withAttachments {
 		for k, v := range m.Attachments {
 			buf.WriteString(fmt.Sprintf("\n\n--%s\n", boundary))
