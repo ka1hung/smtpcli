@@ -31,9 +31,48 @@ type Message struct {
 	Attachments map[string][]byte
 }
 
+type unencryptedAuth struct {
+	smtp.Auth
+}
+
+func (a unencryptedAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
+	s := *server
+	s.TLS = true
+	return a.Auth.Start(&s)
+}
+
 // port=> 578:Use TLS; 25:Non-encryption
-func NewServer(addr string, port int, user, password string) *Sender {
+func NewServer(addr string, port int, user, password string, insecure bool) *Sender {
+	if insecure {
+		auth := unencryptedAuth{
+			smtp.PlainAuth(
+				"",
+				user,
+				password,
+				addr,
+			),
+		}
+
+		if user == "" && password == "" {
+			return &Sender{
+				Host:     addr + ":" + strconv.Itoa(port),
+				Port:     port,
+				User:     user,
+				Password: password}
+		}
+
+		return &Sender{
+			Host:     addr + ":" + strconv.Itoa(port),
+			Port:     port,
+			User:     user,
+			Password: password,
+			auth:     auth}
+	}
+
 	auth := smtp.PlainAuth("", user, password, addr)
+	if user == "" && password == "" {
+		auth = nil
+	}
 	return &Sender{
 		Host:     addr + ":" + strconv.Itoa(port),
 		Port:     port,
@@ -41,7 +80,6 @@ func NewServer(addr string, port int, user, password string) *Sender {
 		Password: password,
 		auth:     auth}
 }
-
 func (s *Sender) Send(m *Message) error {
 	return smtp.SendMail(s.Host, s.auth, s.User, m.To, m.toBytes())
 }
