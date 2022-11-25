@@ -17,6 +17,7 @@ import (
 )
 
 func main() {
+	smtpcli.InseureMode = true // set InsecureMode for testing server 
 	sender := smtpcli.NewServer("smtp.gmail.com", 587, "user@gmail.com", "password")
 	m := smtpcli.NewMessage("Subject", "Body message.")
 	m.To = []string{"user1@gmail.com", "user2@gmail.com"}

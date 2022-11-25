@@ -4,21 +4,22 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
-	"net/smtp"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 )
+
+var InsecureMode bool
 
 type Sender struct {
 	Host     string
 	Port     int
 	User     string
 	Password string
-	auth     smtp.Auth
+	auth     Auth
 }
 
 type Message struct {
@@ -31,48 +32,12 @@ type Message struct {
 	Attachments map[string][]byte
 }
 
-type unencryptedAuth struct {
-	smtp.Auth
-}
-
-func (a unencryptedAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
-	s := *server
-	s.TLS = true
-	return a.Auth.Start(&s)
-}
-
-// port=> 578:Use TLS; 25:Non-encryption
-func NewServer(addr string, port int, user, password string, insecure bool) *Sender {
-	if insecure {
-		auth := unencryptedAuth{
-			smtp.PlainAuth(
-				"",
-				user,
-				password,
-				addr,
-			),
-		}
-
-		if user == "" && password == "" {
-			return &Sender{
-				Host:     addr + ":" + strconv.Itoa(port),
-				Port:     port,
-				User:     user,
-				Password: password}
-		}
-
-		return &Sender{
-			Host:     addr + ":" + strconv.Itoa(port),
-			Port:     port,
-			User:     user,
-			Password: password,
-			auth:     auth}
-	}
-
-	auth := smtp.PlainAuth("", user, password, addr)
+func NewServer(addr string, port int, user, password string) *Sender {
+	auth := PlainAuth("", user, password, addr)
 	if user == "" && password == "" {
 		auth = nil
 	}
+
 	return &Sender{
 		Host:     addr + ":" + strconv.Itoa(port),
 		Port:     port,
@@ -81,7 +46,7 @@ func NewServer(addr string, port int, user, password string, insecure bool) *Sen
 		auth:     auth}
 }
 func (s *Sender) Send(m *Message) error {
-	return smtp.SendMail(s.Host, s.auth, s.User, m.To, m.toBytes())
+	return SendMail(s.Host, s.auth, s.User, m.To, m.toBytes())
 }
 
 // default set ContentType to text/plain; charset=UTF-8.
@@ -93,7 +58,7 @@ func NewMessage(subject, body string) *Message {
 // fs: set the files path
 func (m *Message) AttachFiles(files []string) error {
 	for _, f := range files {
-		b, err := ioutil.ReadFile(f)
+		b, err := os.ReadFile(f)
 		if err != nil {
 			return err
 		}
