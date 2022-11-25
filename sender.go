@@ -17,7 +17,7 @@ var InsecureMode bool
 type Sender struct {
 	Host     string
 	Port     int
-	User     string
+	From     string
 	Password string
 	auth     Auth
 }
@@ -32,7 +32,7 @@ type Message struct {
 	Attachments map[string][]byte
 }
 
-func NewServer(addr string, port int, user, password string) *Sender {
+func NewServer(addr string, port int, from, user, password string) *Sender {
 	auth := PlainAuth("", user, password, addr)
 	if user == "" && password == "" {
 		auth = nil
@@ -41,12 +41,12 @@ func NewServer(addr string, port int, user, password string) *Sender {
 	return &Sender{
 		Host:     addr + ":" + strconv.Itoa(port),
 		Port:     port,
-		User:     user,
+		From:     from,
 		Password: password,
 		auth:     auth}
 }
 func (s *Sender) Send(m *Message) error {
-	return SendMail(s.Host, s.auth, s.User, m.To, m.toBytes())
+	return SendMail(s.Host, s.auth, s.From, m.To, m.toBytes())
 }
 
 // default set ContentType to text/plain; charset=UTF-8.

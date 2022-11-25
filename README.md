@@ -17,8 +17,16 @@ import (
 )
 
 func main() {
-	smtpcli.InseureMode = true // set InsecureMode for testing server 
-	sender := smtpcli.NewServer("smtp.gmail.com", 587, "user@gmail.com", "password")
+	// set InsecureMode for testing server 
+	smtpcli.InseureMode = true 
+
+	server := "smtp.gmail.com"
+	port := 587
+	from := "user@gmail.com"
+	user := "user@gmail.com"
+	passwd := "password"
+
+	sender := smtpcli.NewServer(server,port,from,user,passwd)
 	m := smtpcli.NewMessage("Subject", "Body message.")
 	m.To = []string{"user1@gmail.com", "user2@gmail.com"}
 	fmt.Println(sender.Send(m))
@@ -35,7 +43,13 @@ import (
 )
 
 func main() {
-	sender := smtpcli.NewServer("smtp.gmail.com", 587, "user@gmail.com", "password")
+	server := "smtp.gmail.com"
+	port := 587
+	from := "user@gmail.com"
+	user := "user@gmail.com"
+	passwd := "password"
+
+	sender := smtpcli.NewServer(server,port,from,user,passwd)
 	m := smtpcli.NewMessage("Subject", "Body message.")
 	m.To = []string{"user1@gmail.com", "user2@gmail.com"}
 	m.CC = []string{"user3@gmail.com", "user4@gmail.com"}
@@ -54,7 +68,13 @@ import (
 )
 
 func main() {
-	sender := smtpcli.NewServer("smtp.gmail.com", 587, "user@gmail.com", "password")
+	server := "smtp.gmail.com"
+	port := 587
+	from := "user@gmail.com"
+	user := "user@gmail.com"
+	passwd := "password"
+
+	sender := smtpcli.NewServer(server,port,from,user,passwd)
 	m := smtpcli.NewMessage("Subject", "<h1>Body message</h1>")
 	m.To = []string{"user1@gmail.com", "user2@gmail.com"}
 	m.ContentType = "text/html; charset=utf-8"
@@ -72,7 +92,13 @@ import (
 )
 
 func main() {
-	sender := smtpcli.NewServer("smtp.gmail.com", 587, "user@gmail.com", "password")
+	server := "smtp.gmail.com"
+	port := 587
+	from := "user@gmail.com"
+	user := "user@gmail.com"
+	passwd := "password"
+
+	sender := smtpcli.NewServer(server,port,from,user,passwd)
 	m := smtpcli.NewMessage("Subject", "<h1>Body message</h1>")
 	m.To = []string{"user1@gmail.com", "user2@gmail.com"}
 	m.ContentType = "text/html; charset=utf-8"
@@ -91,7 +117,13 @@ import (
 )
 
 func main() {
-	sender := smtpcli.NewServer("smtp.gmail.com", 587, "user@gmail.com", "password")
+	server := "smtp.gmail.com"
+	port := 587
+	from := "user@gmail.com"
+	user := "user@gmail.com"
+	passwd := "password"
+
+	sender := smtpcli.NewServer(server,port,from,user,passwd)
 	m := smtpcli.NewMessage("Subject", "<h1>Body message</h1>")
 	m.To = []string{"user1@gmail.com", "user2@gmail.com"}
 	m.ContentType = "text/html; charset=utf-8"
