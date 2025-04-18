@@ -24,6 +24,7 @@ type Sender struct {
 
 type Message struct {
 	ContentType string
+	From        string
 	To          []string
 	CC          []string
 	BCC         []string
@@ -51,8 +52,8 @@ func (s *Sender) Send(m *Message) error {
 
 // default set ContentType to text/plain; charset=UTF-8.
 // body: use /r/n to make newline.
-func NewMessage(subject, body string) *Message {
-	return &Message{ContentType: "text/plain; charset=UTF-8", Subject: subject, Body: body, Attachments: make(map[string][]byte)}
+func NewMessage(from, subject, body string) *Message {
+	return &Message{ContentType: "text/plain; charset=UTF-8", From: from, Subject: subject, Body: body, Attachments: make(map[string][]byte)}
 }
 
 // fs: set the files path
@@ -72,6 +73,7 @@ func (m *Message) AttachFiles(files []string) error {
 func (m *Message) toBytes() []byte {
 	buf := bytes.NewBuffer(nil)
 	withAttachments := len(m.Attachments) > 0
+	buf.WriteString(fmt.Sprintf("From: %s\n", m.From))
 	buf.WriteString(fmt.Sprintf("Subject: %s\n", m.Subject))
 	buf.WriteString(fmt.Sprintf("To: %s\n", strings.Join(m.To, ",")))
 	if len(m.CC) > 0 {
